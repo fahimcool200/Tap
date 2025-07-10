@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TapTak - Final Version</title>
+
+    <!-- Social Media Meta Tags for Rich Link Previews -->
+    <meta property="og:title" content="Join me on TapTak & Earn Rewards!" />
+    <meta property="og:description" content="TapTak is a fun app to earn coins through tasks, spins, and referrals. Sign up with my link to get a special bonus!" />
+    <meta property="og:image" content="https://i.ibb.co/hR2Y33n/banner.jpg" />
+    <meta property="og:url" content="https://taptaka-bd.firebaseapp.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Join me on TapTak & Earn Rewards!">
+    <meta name="twitter:description" content="Sign up with my link to get a special bonus!">
+    <meta name="twitter:image" content="https://i.ibb.co/hR2Y33n/banner.jpg">
+
+    <!-- External CSS File -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script> 
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="light-mode">
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTSEhLaEJJQVVBdWRpbyBvZiB0aGUgRWFzdGVybiBIZW1pc3BoZXJlIChBQUVILCBUYWl3YW4pAP/2A4APAAAAAAAAAAAAFRAREAAAB6AAAAAAAElBTUUzLjEwMA8AAAAAPgA/AD8APwA/AD8AAAAAAAA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD-A4A" type="audio/mpeg">
+    </audio>
+
+    <div id="loading-overlay">
+        <div class="coin-loader">
+            <div class="coin">
+                <div class="side front"><i class="fas fa-coins"></i></div>
+                <div class="side back"><i class="fas fa-dollar-sign"></i></div>
+                <div class="middle"></div>
+            </div>
+        </div>
+        <p>Loading TapTak...</p>
+    </div>
+
+    <div id="auth-container">
+        <div id="auth-message-global" class="loading-indicator global" style="display: none;"></div>
+        <div id="login-form" class="auth-form" style="display: none;">
+            <h2>Login to TapTak</h2>
+            <div class="form-group"> <label for="login-email">Email</label> <input type="email" id="login-email" required> </div>
+            <div class="form-group"> <label for="login-password">Password</label> <input type="password" id="login-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('login-password', this)"></i> </div>
+            <div id="login-message" class="message-area"></div>
+            <div class="forgot-password-link"><a onclick="showAuthForm('forgot')">Forgot Password?</a></div>
+            <button class="btn-login" onclick="loginUser()">Login</button>
+            <p class="auth-toggle-link">No account? <a onclick="showAuthForm('signup')">Sign Up</a></p>
+            <div class="auth-separator"><span>OR</span></div>
+            <button id="googleSignInBtn" onclick="signInWithGoogle()"> <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg> Sign in with Google </button>
+        </div>
+        <div id="signup-form" class="auth-form" style="display: none;">
+             <h2>Sign Up for TapTak</h2>
+            <div class="form-group"> <label for="signup-username">Username</label> <input type="text" id="signup-username" required> </div>
+            <div class="form-group"> <label for="signup-email">Email</label> <input type="email" id="signup-email" required> </div>
+            <div class="form-group"> <label for="signup-password">Password (min. 6 characters)</label> <input type="password" id="signup-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('signup-password', this)"></i> </div>
+            <!-- [MODIFIED] Added referral code input to signup form -->
+            <div class="form-group"> <label for="signup-referral-code">Referral Code (Optional)</label> <input type="text" id="signup-referral-code"> </div>
+            <div id="signup-message" class="message-area"></div>
+            <button class="btn-login" onclick="signupUser()">Sign Up</button>
+            <p class="auth-toggle-link">Already have an account? <a onclick="showAuthForm('login')">Login</a></p>
+            <div class="auth-separator"><span>OR</span></div>
+            <button id="googleSignUpBtn" onclick="signInWithGoogle()"> <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg> Sign up with Google </button>
+        </div>
+        <div id="forgot-password-form" class="auth-form" style="display: none;">
+            <h2>Password Reset</h2> <p style="font-size:0.9em; color:#666; margin-bottom: 15px;">Enter your email for a reset link.</p>
+            <div class="form-group"> <label for="forgot-email">Email</label> <input type="email" id="forgot-email" required> </div>
+            <div id="forgot-password-message" class="message-area"></div>
+            <button class="btn-login" onclick="sendPasswordReset()">Send Reset Link</button>
+            <p class="auth-toggle-link"><a onclick="showAuthForm('login')">Back to Login</a></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display: none;">
+        <header>
+             <div class="header-left"> <img id="appLogo" src="https://i.ibb.co/p3wH2XG/logo.png" alt="logo"> </div>
+             <div class="header-right">
+                 <button id="notificationButton" onclick="showPage('page-notification-history')">
+                     <i class="fas fa-bell"></i>
+                     <span id="notificationBadge">0</span>
+                 </button>
+                 <div class="coin-box"> Coins: <span id="coin-balance">0</span> </div>
+                 <div class="menu-icon" id="menuIcon" onclick="toggleMenu(event)">⋮</div>
+                 <div class="dropdown-panel" id="dropdownMenu">
+                     <a onclick="showPage('page-settings'); closeMenu();"><i class="fas fa-cog"></i> Settings</a>
+                     <a onclick="showPage('page-about'); closeMenu();"><i class="fas fa-info-circle"></i> About</a>
+                     <a onclick="showPage('page-support'); closeMenu();"><i class="fas fa-headset"></i> Support</a>
+                     <a onclick="showPage('page-help'); closeMenu();"><i class="fas fa-question-circle"></i> Help</a>
+                     <a id="logoutButton" onclick="logoutUser(); closeMenu();"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                 </div>
+             </div>
+        </header>
+        <main>
+            <div id="page-home" class="page active-page">
+                 <div id="welcomeMessageContainer" style="width: 100%; text-align: center; margin-bottom: 15px;"> <h3 id="welcomeMessage" style="display: none; font-weight: 500;"></h3> </div>
+                 <div class="banner"> <img id="bannerImage" src="https://i.ibb.co/hR2Y33n/banner.jpg" alt="Banner"> </div>
+                 <div class="home-actions">
+                    <div class="action-card" onclick="showPage('page-wallet')"><i class="fas fa-wallet icon-wallet"></i> <span>My Wallet</span></div>
+                    <div class="action-card" onclick="showPage('page-leaderboard')"><i class="fas fa-trophy icon-leaderboard"></i> <span>Leaderboard</span></div>
+                    <div class="action-card" onclick="showPage('page-daily-earning')"><i class="fas fa-calendar-check icon-earn"></i> <span>Daily Earning</span></div>
+                    <div class="action-card" onclick="showPage('page-tasks')"><i class="fas fa-tasks icon-tasks"></i> <span>Tasks</span></div>
+                    <div class="action-card" onclick="showPage('page-visit-earn')"><i class="fas fa-mouse-pointer icon-visit"></i> <span>Visit & Earn</span></div>
+                    <div class="action-card" onclick="showPage('page-withdraw')"><i class="fas fa-hand-holding-usd icon-withdraw"></i> <span>Withdraw</span></div>
+                    <div class="action-card" onclick="showPage('page-referral')"><i class="fas fa-user-friends icon-refer"></i> <span>Refer & Earn</span></div>
+                    <div class="action-card" onclick="showPage('page-global-chat')"><i class="fas fa-comments icon-chat"></i> <span>Global Chat</span></div>
+                </div>
+            </div>
+
+            <div id="page-wallet" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">My Wallet</h2> </div>
+                <div class="page-content-container">
+                    <div class="wallet-card-container">
+                        <div class="wallet-card">
+                            <div class="wallet-card-inner">
+                                <div class="wallet-card-bg"></div>
+                                <div class="wallet-card-holo"></div>
+                                <div class="wallet-card-content">
+                                    <div class="wallet-card-top">
+                                        <div class="wallet-chip"></div>
+                                        <div class="wallet-brand-logo">
+                                            <div class="circle red"></div>
+                                            <div class="circle yellow"></div>
+                                        </div>
+                                    </div>
+                                    <div class="wallet-balance-info">
+                                        <div class="wallet-balance-label">Current Balance</div>
+                                        <div id="wallet-page-balance">0</div>
+                                    </div>
+                                    <div class="wallet-card-bottom">
+                                        <div class="wallet-card-holder-name" id="wallet-page-username">TAPTAK USER</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wallet-actions">
+                        <button class="wallet-action-btn" onclick="showPage('page-withdraw')"><i class="fas fa-hand-holding-usd"></i> Withdraw</button>
+                        <button class="wallet-action-btn" onclick="showPage('page-history')"><i class="fas fa-history"></i> History</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-leaderboard" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Top Earners</h2> </div>
+                <div class="page-content-container">
+                    <div id="leaderboard-list" class="loading-indicator">Loading leaderboard...</div>
+                </div>
+            </div>
+
+             <div id="page-daily-earning" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Daily Earning</h2> </div>
+                 <div class="page-content-container">
+                    <div class="earn-section"> <h3>✔️ Daily Check-in</h3> <p>Check in every day for a small reward!</p> <button id="dailyCheckinBtn" class="earn-btn primary" onclick="claimDailyCheckin()">Check-in</button> <div id="dailyCheckinTimer" class="earn-timer">Checking...</div> </div>
+                     <div class="earn-section"> <h3>🎁 Daily Bonus</h3> <p>Claim your daily reward!</p> <button id="dailyBonusBtn" class="earn-btn primary" onclick="claimDailyBonus()">Claim Bonus</button> <div id="dailyBonusTimer" class="earn-timer">Checking...</div> </div>
+                     <div class="earn-section">
+                        <h3>🎡 Daily Spin</h3> <p>Spin the wheel for a chance to win amazing prizes!</p>
+                        <div class="spin-wheel-container">
+                            <div id="spinWheel"> </div>
+                            <div class="spin-center-display" id="spinCenterDisplay"></div>
+                        </div>
+                        <button id="dailySpinBtn" class="earn-btn primary" onclick="doDailySpin()">Spin Now</button>
+                        <div id="dailySpinResult"></div> <div id="dailySpinTimer" class="earn-timer">Checking...</div>
+                    </div>
+                 </div>
+             </div>
+             <div id="page-tasks" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Weekly Tasks</h2> </div>
+                <div class="page-content-container">
+                    <h3 class="section-title" style="text-align:center;">Complete Tasks for Rewards</h3>
+                    <div id="tasks-list-main" class="loading-indicator">Loading tasks...</div>
+                </div>
+            </div>
+             <div id="page-visit-earn" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Visit & Earn</h2> </div>
+                <div class="page-content-container">
+                    <h3 class="section-title" style="text-align:center;">Available Tasks</h3>
+                    <div id="tasks-list" class="loading-indicator">Loading tasks...</div>
+                </div>
+            </div>
+            
+             <div id="page-global-chat" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Global Chat</h2> </div>
+                <div class="page-content-container">
+                    <div id="chat-messages-list" class="loading-indicator">Loading messages...</div>
+                    <div id="chat-reply-bar">
+                        <div class="reply-info">
+                            <span class="reply-context-user">Replying to User</span>
+                            <span class="reply-context-text">Message content...</span>
+                        </div>
+                        <button id="cancel-reply-btn" onclick="cancelReply()">×</button>
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
+                        <button id="send-chat-message-btn" class="btn-primary" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+             <div id="page-withdraw" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Withdraw Coins</h2> </div>
+                 <div class="page-content-container">
+                     <div class="info-card"> Balance: <strong id="withdraw-coin-balance">0</strong> Coins </div>
+                     <div class="withdrawal-instructions">
+                         <h4>Withdrawal Instructions:</h4>
+                         <ul>
+                             <li>Minimum withdrawal amount is <strong id="minWithdrawalInstruction">1000</strong> Coins.</li>
+                             <li>Withdrawals can only be made <strong>3 times a day</strong>.</li>
+                             <li>Please check carefully whether the information is entered correctly.</li>
+                             <li>If the withdrawal has not been received, please contact customer service.</li>
+                         </ul>
+                     </div>
+                     <div id="withdraw-info" style="text-align: center; margin-bottom: 15px; font-size: 0.95em;">Loading withdrawal info...</div>
+                     <div class="content-page" style="padding: 20px;">
+                        <div class="form-group"> <label for="withdrawAmount">Amount (Coins)</label> <input type="number" id="withdrawAmount" required oninput="calculateEstimatedCurrency()"> <span id="estimatedCurrencyAmount" style="font-size:0.9em; margin-left: 5px;"></span> </div>
+                        <div class="form-group"> <label for="withdrawMethod">Method</label> <select id="withdrawMethod" required onchange="handleWithdrawMethodChange(this)"> <option value="">Select Method</option> <option value="Bkash">Bkash</option> <option value="Nagad">Nagad</option> <option value="Rocket">Rocket</option> <option value="Paypal">PayPal</option><option value="Paytm">Paytm</option> <option value="GPay">Google Pay</option> <option value="Bank Transfer">Bank Transfer</option> <option value="Other">Other</option> </select> </div>
+                        <div class="form-group" id="account-details-group"> <label for="accountDetails">Account Details (Number/Email)</label> <input type="text" id="accountDetails" required> </div>
+                        <div class="form-group" id="other-account-name-group" style="display: none;"> <label for="otherAccountName">Account Name</label> <input type="text" id="otherAccountName"> </div>
+                        <div class="form-group" id="other-account-number-group" style="display: none;"> <label for="otherAccountNumber">Account Number/ID</label> <input type="text" id="otherAccountNumber"> </div>
+                        
+                        <button id="submitWithdrawalBtn" class="btn-primary" style="width: 100%;" onclick="requestWithdrawal()">Submit Request</button>
+                    </div>
+                 </div>
+             </div>
+             <div id="page-history" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Withdrawal History</h2> </div>
+                 <div class="page-content-container"> <div id="history-list" class="loading-indicator">Loading history...</div> <div id="history-message-area"></div> </div>
+            </div>
+             <div id="page-notification-history" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Notification History</h2> </div>
+                 <div class="page-content-container"> <div id="notification-history-list" class="loading-indicator">Loading notification history...</div> </div>
+            </div>
+             <div id="page-referral" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Refer & Earn</h2> </div>
+                 <div class="page-content-container">
+                     <div class="referral-link-box"> <label style="font-weight: 500; display:block; margin-bottom:8px;">Your Referral Link:</label> <span id="referralLinkDisplay">Loading...</span> <button id="copyLinkBtn" class="earn-btn" onclick="copyReferralLink()"><i class="fas fa-copy" style="margin-right: 5px;"></i> Copy Link</button> </div>
+                     <div class="referral-stats" style="text-align:center;">
+                         <p>Friends Joined: <strong id="referral-count">0</strong></p>
+                         <p>Bonus Earned: <strong id="referral-bonus">0</strong> Coins</p>
+                     </div>
+                     <div id="enterReferralSection" class="enter-referral-code-section"> <label for="enteredReferralCodeInput">Got a Referral Code?</label> <input type="text" id="enteredReferralCodeInput" placeholder="Enter code here"> <button id="submitReferralCodeBtn" onclick="submitReferralCode()">Submit Code</button> <div id="referralCodeMessage" class="message-area"></div> </div>
+                 </div>
+             </div>
+             
+              <div id="page-settings" class="page">
+                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Settings</h2> </div>
+                 <div class="page-content-container">
+                    <div class="settings-card">
+                        <h4 class="settings-card-title">Account Information</h4>
+                        <div class="user-info">
+                            <div class="user-info-item">
+                                <span class="user-info-label">Username:</span>
+                                <div id="settings-username-container" class="user-info-value">
+                                    <span id="settingsUsername-text">Loading...</span>
+                                    <input type="text" id="username-edit-input" style="display: none;">
+                                </div>
+                                <div id="username-display-actions">
+                                    <button class="edit-btn" onclick="toggleUsernameEdit(true)"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                                <div id="username-edit-actions" style="display: none;" class="username-edit-actions">
+                                    <button class="edit-btn" onclick="saveUsername()"><i class="fas fa-check" style="color: #2ecc71;"></i></button>
+                                    <button class="edit-btn" onclick="toggleUsernameEdit(false)"><i class="fas fa-times" style="color: #e74c3c;"></i></button>
+                                </div>
+                            </div>
+                            <div class="user-info-item"> <span class="user-info-label">Email:</span> <span id="settingsUserEmail" class="user-info-value">Loading...</span> <button class="copy-btn" onclick="copyUserInfo('settingsUserEmail')"><i class="fas fa-copy"></i> Copy</button> </div>
+                            <div class="user-info-item"> <span class="user-info-label">User ID:</span> <span id="settingsUserId" class="user-info-value">Loading...</span> <button class="copy-btn" onclick="copyUserInfo('settingsUserId')"><i class="fas fa-copy"></i> Copy</button> </div>
+                        </div>
+                    </div>
+                     
+                    <div class="settings-card">
+                        <h4 class="settings-card-title">Appearance</h4>
+                        <div class="settings-toggle-group vertical-layout">
+                            <span>Theme</span>
+                            <div class="settings-radio-group" id="theme-selector">
+                                <input type="radio" id="theme-light" name="theme" value="light-mode"><label for="theme-light">Light</label>
+                                <input type="radio" id="theme-dark" name="theme" value="dark-mode"><label for="theme-dark">Dark</label>
+                                <input type="radio" id="theme-dynamic" name="theme" value="dynamic-mode"><label for="theme-dynamic">Dynamic</label>
+                            </div>
+                        </div>
+                        <div class="settings-toggle-group">
+                            <span>UI Animations</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ui-animations-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h4 class="settings-card-title">Security</h4>
+                        <div class="form-group"> <label for="settings-current-password">Current Password</label> <input type="password" id="settings-current-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('settings-current-password', this)"></i> </div>
+                        <div class="form-group"> <label for="settings-new-password">New Password (min. 6 characters)</label> <input type="password" id="settings-new-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('settings-new-password', this)"></i> </div>
+                        <div class="form-group"> <label for="settings-confirm-password">Confirm New Password</label> <input type="password" id="settings-confirm-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('settings-confirm-password', this)"></i> </div>
+                        <button id="changePasswordBtn" class="btn-primary" onclick="changeUserPassword()">Change Password</button>
+                        <div id="changePasswordMessage" class="message-area"></div>
+                    </div>
+                     
+                    <div class="settings-card">
+                         <h4 class="settings-card-title">Account Actions</h4>
+                         <button type="button" id="deleteAccountBtn" onclick="deleteUserAccount()"> <i class="fas fa-trash-alt"></i> Delete My Account </button> 
+                         <div id="deleteAccountMessage" class="message-area"></div> 
+                    </div>
+                 </div>
+             </div>
+             <div id="page-about" class="page">
+                  <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">About TapTak</h2> </div>
+                  <div class="page-content-container content-page"> <p>TapTak is an application where you can earn coins through various activities and withdraw them.</p> <p>Engage with tasks, daily bonuses, spins, and referrals to accumulate your earnings.</p> <p>Version: 19.1 FINAL</p> </div>
+             </div>
+             <div id="page-support" class="page">
+                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Contact Support</h2> </div>
+                <div class="page-content-container content-page">
+                    <h3>Send a New Message</h3>
+                    <p>If you have any issues with payments, your account, or other questions, please send us a message below. We will review it as soon as possible.</p>
+                    <div class="form-group">
+                        <label for="supportMessage">Your Message</label>
+                        <textarea id="supportMessage" placeholder="Describe your issue in detail..."></textarea>
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Send Message</button>
+                    <div id="supportMessageArea" class="message-area"></div>
+
+                    <div class="settings-section">
+                        <h3>Your Message History</h3>
+                        <div id="support-tickets-list">
+                            <div class="loading-indicator">Loading your messages...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="page-help" class="page">
+                  <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Help & Support</h2> </div>
+                 <div class="page-content-container content-page">
+                     <h4>Getting Started:</h4> <ul> <li>Sign up using your Username, Email/Password, or with your Google account.</li> <li>Explore the "Earn Coins" and "Visit & Earn" pages to find ways to earn.</li> <li>Your current coin balance is always visible in the header.</li> </ul>
+                     <h4>Earning Coins:</h4> <ul> <li><strong>Daily Bonus & Spin:</strong> Find these on the "Earn Coins" page. Claim them once every 24 hours.</li> <li><strong>Visit Tasks:</strong> Go to the "Visit & Earn" page. A timer will show you when a completed task is available again.</li> <li><strong>Referrals:</strong> Share your unique referral link (found on the "Refer & Earn" page) with friends.</li> </ul>
+                     <h4>Withdrawals:</h4> <ul> <li>Navigate to the "Withdraw" page to request a coin withdrawal.</li> <li>Submitted requests will be reviewed. Check the "History" page for the status of your withdrawals.</li> <li>If a request is rejected by an admin, you will receive a notification and your coins will be refunded.</li> </ul>
+                     <h4>Support:</h4> <ul><li>Go to the "Support" page to send a message to the support team and view your message history.</li></ul>
+                     <p style="margin-top: 20px;">If you need further assistance, please go to the "Support" page or email us at: <a href="mailto:support@taptak.example.com">support@taptak.example.com</a></p>
+                 </div>
+             </div>
+        </main>
+        <footer class="footer"> © <span id="currentYear"></span> TapTak. All rights reserved. </footer>
+    </div>
+    
+    <div id="page-visit-task-view" class="page">
+        <div class="visit-task-header">
+            <h3>Complete Task</h3>
+            <div class="visit-task-timer" id="visit-task-timer-display"></div>
+        </div>
+        <iframe id="visit-task-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+
+    <!-- Daily Spin Reminder Popup HTML -->
+    <div id="special-popup-overlay">
+        <div class="special-popup-content">
+            <button id="popup-close-btn" onclick="hideSpecialPopup()">×</button>
+            <div class="popup-icon"><i class="fas fa-gift"></i></div>
+            <h3 id="popup-title">Daily Spin Ready!</h3>
+            <p id="popup-message">Your free daily spin is waiting for you. Spin now to win amazing prizes!</p>
+            <button id="popup-cta-btn" class="earn-btn primary">Go to Spin Page</button>
+        </div>
+    </div>
+    
+    <!-- Withdrawal Success Page HTML -->
+    <div id="withdrawal-success-page">
+        <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <h2>Success!</h2>
+        <p>Your withdrawal request has been submitted successfully.</p>
+        <!-- [MODIFIED] Changed button text and behavior -->
+        <button id="view-history-btn" onclick="hideWithdrawalSuccessPage()">Go to History</button>
+    </div>
+
+    <!-- Generic Confirmation Popup -->
+    <div id="confirmation-popup-overlay">
+        <div class="confirmation-popup-content">
+            <h3 id="confirmation-popup-title">Are you sure?</h3>
+            <p id="confirmation-popup-message">This action cannot be undone.</p>
+            <div class="confirmation-popup-actions">
+                <button id="confirmation-popup-no" class="btn-secondary">No</button>
+                <button id="confirmation-popup-yes" class="btn-primary">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- External JS File -->
+    <script defer src="script.js"></script>
+
+</body>
+</html>
