@@ -20,17 +20,20 @@
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script> 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="light-mode">
+    <div id="background-bubbles"></div>
+    <div id="jackpot-confetti-container"></div>
+    
     <audio id="notificationSound" preload="auto">
-        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTSEhLaEJJQVVBdWRpbyBvZiB0aGUgRWFzdGVybiBIZW1pc3BoZXJlIChBQUVILCBUYWl3YW4pAP/2A4APAAAAAAAAAAAAFRAREAAAB6AAAAAAAElBTUUzLjEwMA8AAAAAPgA/AD8APwA/AD8AAAAAAAA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD-A4A" type="audio/mpeg">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTSEhLaEJJQVVBdWRpbyBvZiB0aGUgRWFzdGVybiBIZW1pc3BoZXJlIChBQUVILCBUYWl3YW4pAP/2A4APAAAAAAAAAAAAFRAREAAAB6AAAAAAAElBTUUzLjEwMA8AAAAAPgA/AD8APwA/AD8AAAAAAAA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APwA/AD8APw-A4A" type="audio/mpeg">
     </audio>
 
     <div id="loading-overlay">
@@ -62,7 +65,6 @@
             <div class="form-group"> <label for="signup-username">Username</label> <input type="text" id="signup-username" required> </div>
             <div class="form-group"> <label for="signup-email">Email</label> <input type="email" id="signup-email" required> </div>
             <div class="form-group"> <label for="signup-password">Password (min. 6 characters)</label> <input type="password" id="signup-password" required> <i class="fas fa-eye password-toggle-icon" onclick="togglePasswordVisibility('signup-password', this)"></i> </div>
-            <!-- [MODIFIED] Added referral code input to signup form -->
             <div class="form-group"> <label for="signup-referral-code">Referral Code (Optional)</label> <input type="text" id="signup-referral-code"> </div>
             <div id="signup-message" class="message-area"></div>
             <button class="btn-login" onclick="signupUser()">Sign Up</button>
@@ -100,13 +102,16 @@
         </header>
         <main>
             <div id="page-home" class="page active-page">
-                 <div id="welcomeMessageContainer" style="width: 100%; text-align: center; margin-bottom: 15px;"> <h3 id="welcomeMessage" style="display: none; font-weight: 500;"></h3> </div>
+                 <div id="welcomeMessageContainer" style="width: 100%; text-align: center; margin-bottom: 15px; min-height: 28px;"> 
+                    <h3 id="welcomeMessage" style="display: none; font-weight: 500;"></h3>
+                    <!-- A clock element will be dynamically added here by script.js -->
+                 </div>
                  <div class="banner"> <img id="bannerImage" src="https://i.ibb.co/hR2Y33n/banner.jpg" alt="Banner"> </div>
                  <div class="home-actions">
                     <div class="action-card" onclick="showPage('page-wallet')"><i class="fas fa-wallet icon-wallet"></i> <span>My Wallet</span></div>
                     <div class="action-card" onclick="showPage('page-leaderboard')"><i class="fas fa-trophy icon-leaderboard"></i> <span>Leaderboard</span></div>
                     <div class="action-card" onclick="showPage('page-daily-earning')"><i class="fas fa-calendar-check icon-earn"></i> <span>Daily Earning</span></div>
-                    <div class="action-card" onclick="showPage('page-tasks')"><i class="fas fa-tasks icon-tasks"></i> <span>Tasks</span></div>
+                    <div class="action-card" onclick="showPage('page-support')"><i class="fas fa-headset icon-support"></i> <span>Support</span></div>
                     <div class="action-card" onclick="showPage('page-visit-earn')"><i class="fas fa-mouse-pointer icon-visit"></i> <span>Visit & Earn</span></div>
                     <div class="action-card" onclick="showPage('page-withdraw')"><i class="fas fa-hand-holding-usd icon-withdraw"></i> <span>Withdraw</span></div>
                     <div class="action-card" onclick="showPage('page-referral')"><i class="fas fa-user-friends icon-refer"></i> <span>Refer & Earn</span></div>
@@ -145,6 +150,14 @@
                         <button class="wallet-action-btn" onclick="showPage('page-withdraw')"><i class="fas fa-hand-holding-usd"></i> Withdraw</button>
                         <button class="wallet-action-btn" onclick="showPage('page-history')"><i class="fas fa-history"></i> History</button>
                     </div>
+
+                    <div class="live-payouts-section">
+                        <h3 class="live-payouts-title"><i class="fas fa-satellite-dish"></i> Recent Global Payouts</h3>
+                        <div id="live-payouts-ticker-container">
+                            <!-- Ticker content will be dynamically loaded by JS -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -158,16 +171,26 @@
              <div id="page-daily-earning" class="page">
                  <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Daily Earning</h2> </div>
                  <div class="page-content-container">
-                    <div class="earn-section"> <h3>✔️ Daily Check-in</h3> <p>Check in every day for a small reward!</p> <button id="dailyCheckinBtn" class="earn-btn primary" onclick="claimDailyCheckin()">Check-in</button> <div id="dailyCheckinTimer" class="earn-timer">Checking...</div> </div>
+                    <div class="earn-section">
+                        <div class="real-date" id="real-date-display"></div>
+                        <h3>✔️ Daily Check-in</h3>
+                        <p>Check in every day for a small reward!</p>
+                        <button id="dailyCheckinBtn" class="earn-btn primary" onclick="claimDailyCheckin()">Check-in</button>
+                        <div id="dailyCheckinTimer" class="earn-timer">Checking...</div>
+                    </div>
                      <div class="earn-section"> <h3>🎁 Daily Bonus</h3> <p>Claim your daily reward!</p> <button id="dailyBonusBtn" class="earn-btn primary" onclick="claimDailyBonus()">Claim Bonus</button> <div id="dailyBonusTimer" class="earn-timer">Checking...</div> </div>
+                     
                      <div class="earn-section">
                         <h3>🎡 Daily Spin</h3> <p>Spin the wheel for a chance to win amazing prizes!</p>
+                        
                         <div class="spin-wheel-container">
-                            <div id="spinWheel"> </div>
-                            <div class="spin-center-display" id="spinCenterDisplay"></div>
+                            <div class="spin-pointer"></div>
+                            <canvas id="spinWheelCanvas" width="500" height="500"></canvas>
+                            <button id="spin-btn">SPIN</button>
                         </div>
-                        <button id="dailySpinBtn" class="earn-btn primary" onclick="doDailySpin()">Spin Now</button>
-                        <div id="dailySpinResult"></div> <div id="dailySpinTimer" class="earn-timer">Checking...</div>
+                        
+                        <div id="dailySpinTimer" class="earn-timer">Checking...</div>
+                        <div id="dailySpinResult"></div> 
                     </div>
                  </div>
              </div>
@@ -183,24 +206,6 @@
                 <div class="page-content-container">
                     <h3 class="section-title" style="text-align:center;">Available Tasks</h3>
                     <div id="tasks-list" class="loading-indicator">Loading tasks...</div>
-                </div>
-            </div>
-            
-             <div id="page-global-chat" class="page">
-                <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Global Chat</h2> </div>
-                <div class="page-content-container">
-                    <div id="chat-messages-list" class="loading-indicator">Loading messages...</div>
-                    <div id="chat-reply-bar">
-                        <div class="reply-info">
-                            <span class="reply-context-user">Replying to User</span>
-                            <span class="reply-context-text">Message content...</span>
-                        </div>
-                        <button id="cancel-reply-btn" onclick="cancelReply()">×</button>
-                    </div>
-                    <div class="chat-input-area">
-                        <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
-                        <button id="send-chat-message-btn" class="btn-primary" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
-                    </div>
                 </div>
             </div>
 
@@ -278,18 +283,42 @@
                         <h4 class="settings-card-title">Appearance</h4>
                         <div class="settings-toggle-group vertical-layout">
                             <span>Theme</span>
-                            <div class="settings-radio-group" id="theme-selector">
-                                <input type="radio" id="theme-light" name="theme" value="light-mode"><label for="theme-light">Light</label>
-                                <input type="radio" id="theme-dark" name="theme" value="dark-mode"><label for="theme-dark">Dark</label>
-                                <input type="radio" id="theme-dynamic" name="theme" value="dynamic-mode"><label for="theme-dynamic">Dynamic</label>
+                            <div class="settings-theme-selector" id="theme-selector">
+                                <label class="theme-preview-label">
+                                    <input type="radio" name="theme" value="light-mode">
+                                    <div class="theme-preview-box light"></div>
+                                    <span>Light</span>
+                                </label>
+                                <label class="theme-preview-label">
+                                    <input type="radio" name="theme" value="dark-mode">
+                                    <div class="theme-preview-box dark"></div>
+                                    <span>Dark</span>
+                                </label>
+                                <label class="theme-preview-label">
+                                    <input type="radio" name="theme" value="dynamic-mode">
+                                    <div class="theme-preview-box dynamic"></div>
+                                    <span>Dynamic</span>
+                                </label>
                             </div>
                         </div>
+                        <hr class="settings-divider">
                         <div class="settings-toggle-group">
                             <span>UI Animations</span>
                             <label class="switch">
                                 <input type="checkbox" id="ui-animations-toggle">
                                 <span class="slider"></span>
                             </label>
+                        </div>
+                        <hr class="settings-divider">
+                        <div class="settings-toggle-group">
+                            <span>Neon Glow</span>
+                            <select id="neon-glow-selector" class="settings-select">
+                                <option value="off">Off</option>
+                                <option value="green">Green</option>
+                                <option value="red">Red</option>
+                                <option value="gold">Gold</option>
+                                <option value="blue">Blue</option>
+                            </select>
                         </div>
                     </div>
 
@@ -311,7 +340,7 @@
              </div>
              <div id="page-about" class="page">
                   <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"> <i class="fas fa-chevron-left"></i></button> <h2 class="section-title">About TapTak</h2> </div>
-                  <div class="page-content-container content-page"> <p>TapTak is an application where you can earn coins through various activities and withdraw them.</p> <p>Engage with tasks, daily bonuses, spins, and referrals to accumulate your earnings.</p> <p>Version: 19.1 FINAL</p> </div>
+                  <div class="page-content-container content-page"> <p>TapTak is an application where you can earn coins through various activities and withdraw them.</p> <p>Engage with tasks, daily bonuses, spins, and referrals to accumulate your earnings.</p> <p>Version: 19.5 FINAL</p> </div>
              </div>
              <div id="page-support" class="page">
                 <div class="page-top-bar"> <button class="top-back-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button> <h2 class="section-title">Contact Support</h2> </div>
@@ -347,13 +376,27 @@
         <footer class="footer"> © <span id="currentYear"></span> TapTak. All rights reserved. </footer>
     </div>
     
-    <div id="page-visit-task-view" class="page">
-        <div class="visit-task-header">
-            <h3>Complete Task</h3>
-            <div class="visit-task-timer" id="visit-task-timer-display"></div>
+    <div id="page-global-chat" class="page-overlay">
+        <div class="page-top-bar">
+            <button class="top-back-btn" onclick="showPage('page-home')"><i class="fas fa-chevron-left"></i></button>
+            <h2 class="section-title">Global Chat</h2>
         </div>
-        <iframe id="visit-task-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div class="page-content-container">
+            <div id="chat-messages-list" class="loading-indicator">Loading messages...</div>
+            <div id="chat-reply-bar">
+                <div class="reply-info">
+                    <span class="reply-context-user">Replying to User</span>
+                    <span class="reply-context-text">Message content...</span>
+                </div>
+                <button id="cancel-reply-btn" onclick="cancelReply()">×</button>
+            </div>
+            <div class="chat-input-area">
+                <textarea id="chat-message-input" placeholder="Type a message..." rows="1"></textarea>
+                <button id="send-chat-message-btn" class="btn-primary" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
+
 
     <!-- Daily Spin Reminder Popup HTML -->
     <div id="special-popup-overlay">
@@ -374,7 +417,6 @@
         </svg>
         <h2>Success!</h2>
         <p>Your withdrawal request has been submitted successfully.</p>
-        <!-- [MODIFIED] Changed button text and behavior -->
         <button id="view-history-btn" onclick="hideWithdrawalSuccessPage()">Go to History</button>
     </div>
 
@@ -391,9 +433,11 @@
     </div>
 
     <div id="toast-container"></div>
-
+    
     <!-- External JS File -->
     <script defer src="script.js"></script>
 
 </body>
 </html>
+<script type='text/javascript' src='//pl27180800.profitableratecpm.com/c9/ac/05/c9ac05ffe5d4a5c26df7eafd4b852695.js'></script>
+<script type='text/javascript' src='//pl27180838.profitableratecpm.com/82/7d/4d/827d4de4192ec672434373d1a6eed292.js'></script>
