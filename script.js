@@ -44,7 +44,7 @@ let appLoadStartTime = Date.now();
 let activeMessageOptionsMenu = null;
 let chatListeners = {};
 let replyingToMessage = null;
-const availableReactions = ['👍', '🤑', '👎🏻', '❤️', '😂', '😮', '😢', '😡'];
+const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 const neonGlowElements = [
     '.action-card', '.form-group input', '.form-group select', '.form-group textarea',
     '.btn-primary', '.btn-login', '.earn-btn', '.wallet-action-btn',
@@ -197,30 +197,63 @@ function checkUserStatusAndProceed(user) {
      }).catch(() => { showToast("Error checking account status.", 'error'); auth.signOut(); });
 }
 
+// MODIFIED: Restructured to prevent a race condition on new user sign-up.
+// It now creates a basic user record first, then applies referral bonuses.
 async function createUserInDatabase(user, username, referredByCode = null) {
     const rc = generateReferralCode(user.uid);
-    const userData = { email: user.email, username: username, avatarUrl: user.photoURL || null, coins: 0, totalEarnings: 0, isAdmin: false, isBlocked: false, isBanned: false, createdAt: firebase.database.ServerValue.TIMESTAMP, lastEarnedTimestamps: {}, referralCode: rc, hasEnteredReferralCode: !!referredByCode, referredBy: null, lastDailyBonusClaim: 0, lastSpinClaim: 0, lastDailyCheckinClaim: 0, provider: user.providerData[0].providerId };
-    
+    // 1. Prepare the initial user data with default values.
+    const initialUserData = {
+        email: user.email,
+        username: username,
+        avatarUrl: user.photoURL || null,
+        coins: 0,
+        totalEarnings: 0,
+        isAdmin: false, isBlocked: false, isBanned: false,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        lastEarnedTimestamps: {},
+        referralCode: rc,
+        hasEnteredReferralCode: false, // Default to false, will be updated on successful referral
+        referredBy: null,
+        lastDailyBonusClaim: 0, lastSpinClaim: 0, lastDailyCheckinClaim: 0,
+        provider: user.providerData[0].providerId
+    };
+
+    // 2. Immediately create the user's record in the database.
+    // This solves the "Account data missing" race condition.
+    await db.ref('users/' + user.uid).set(initialUserData);
+
+    // 3. If a referral code was provided, process it.
     if (referredByCode) {
         const referrerSnapshot = await db.ref('users').orderByChild('referralCode').equalTo(referredByCode).once('value');
         if (referrerSnapshot.exists()) {
             let referrerUid;
             referrerSnapshot.forEach(child => { referrerUid = child.key; });
-            userData.coins = NEW_USER_REFERRAL_BONUS;
-            userData.totalEarnings = NEW_USER_REFERRAL_BONUS;
-            userData.referredBy = referrerUid;
-            await db.ref(`users/${referrerUid}`).update({
-                coins: firebase.database.ServerValue.increment(REFERRER_BONUS),
-                totalEarnings: firebase.database.ServerValue.increment(REFERRER_BONUS),
-                [`referrals/list/${user.uid}`]: firebase.database.ServerValue.TIMESTAMP
-            });
-            addNotificationForUser(referrerUid, 'New Referral!', `${username} used your code. You earned +${REFERRER_BONUS} coins!`, 'reward');
+
+            // A valid referrer was found. Now update both the new user and the referrer.
+            if (referrerUid) {
+                // Update the referrer's account with their bonus.
+                await db.ref(`users/${referrerUid}`).update({
+                    coins: firebase.database.ServerValue.increment(REFERRER_BONUS),
+                    totalEarnings: firebase.database.ServerValue.increment(REFERRER_BONUS),
+                    [`referrals/list/${user.uid}`]: firebase.database.ServerValue.TIMESTAMP
+                });
+                addNotificationForUser(referrerUid, 'New Referral!', `${username} used your code. You earned +${REFERRER_BONUS} coins!`, 'reward');
+
+                // Update the new user's account with their bonus and referral info.
+                await db.ref('users/' + user.uid).update({
+                    coins: NEW_USER_REFERRAL_BONUS,
+                    totalEarnings: NEW_USER_REFERRAL_BONUS,
+                    referredBy: referrerUid,
+                    hasEnteredReferralCode: true // Set to true only on success.
+                });
+            }
         }
     }
-    
-    await db.ref('users/' + user.uid).set(userData);
+
+    // 4. Send a welcome notification to the new user.
     addNotificationForUser(user.uid, 'Welcome to TapTak!', `You successfully created your account. Start earning!`, 'welcome');
 }
+
 
 function addNotification(title, message, type = 'info') { if (!currentUser || !db) return; addNotificationForUser(currentUser.uid, title, message, type); }
 function addNotificationForUser(userId, title, message, type = 'info') {
