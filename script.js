@@ -187,18 +187,65 @@ function resetAppStateForLogout() {
      hideLoadingOverlay();
 }
 
+// MODIFIED: This function now patiently waits for user data to appear after sign-up, fixing the race condition.
 function checkUserStatusAndProceed(user) {
-     if (!db || !user) { hideLoadingOverlay(); return; }
-     db.ref(`users/${user.uid}`).once('value').then(s => {
-         const d = s.val();
-         if (!d) { showToast("Account data missing.", 'error'); auth.signOut(); return; }
-         if (d.isBlocked || d.isBanned) { showToast(d.isBanned ? "Account banned." : "Account blocked.", 'error'); auth.signOut(); }
-         else { setupUserDataListener(currentUser.uid); setupAppConfigListener(); setupGlobalSupportListener(currentUser.uid); }
-     }).catch(() => { showToast("Error checking account status.", 'error'); auth.signOut(); });
+    if (!db || !user) {
+        hideLoadingOverlay();
+        return;
+    }
+
+    const userStatusRef = db.ref(`users/${user.uid}`);
+    let listener = null;
+    let timeoutId = null;
+
+    const cleanup = () => {
+        if (listener) {
+            userStatusRef.off('value', listener);
+            listener = null;
+        }
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+        }
+    };
+
+    listener = userStatusRef.on('value', snapshot => {
+        const userData = snapshot.val();
+
+        // If data exists, we can proceed.
+        if (userData) {
+            cleanup(); // Stop listening and clear timeout.
+
+            if (userData.isBlocked || userData.isBanned) {
+                showToast(userData.isBanned ? "Account banned." : "Account blocked.", 'error');
+                auth.signOut();
+            } else {
+                // The main, long-term listener for user data.
+                setupUserDataListener(user.uid);
+                // Listeners for other parts of the app.
+                setupAppConfigListener();
+                setupGlobalSupportListener(user.uid);
+            }
+        }
+        // If userData is null, we do nothing and just wait. 
+        // The listener will fire again when the data is created.
+    }, error => {
+        cleanup();
+        showToast("Error checking account status.", 'error');
+        auth.signOut();
+    });
+
+    // Add a timeout to prevent an infinite wait if the database write fails for some reason.
+    timeoutId = setTimeout(() => {
+        // This code runs only if the listener did not find data within 5 seconds.
+        if (listener) { // Check if we are still listening
+            cleanup();
+            showToast("Account creation failed. Please try again.", 'error');
+            auth.signOut();
+        }
+    }, 5000); // 5-second timeout.
 }
 
-// MODIFIED: Restructured to prevent a race condition on new user sign-up.
-// It now creates a basic user record first, then applies referral bonuses.
 async function createUserInDatabase(user, username, referredByCode = null) {
     const rc = generateReferralCode(user.uid);
     // 1. Prepare the initial user data with default values.
